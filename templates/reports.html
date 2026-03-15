@@ -1,0 +1,189 @@
+{% extends "base.html" %}
+
+{% block title %}Relatórios — FinDash{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <h4 class="mb-1"><i class="bi bi-file-earmark-bar-graph me-2 text-primary"></i>Relatórios</h4>
+    <p class="text-muted mb-0">Exporte seus dados para CSV ou Excel (compatível com Power BI)</p>
+</div>
+
+<!-- Filters -->
+<div class="card card-dark mb-4">
+    <div class="card-header border-0 pb-0">
+        <h6 class="mb-0"><i class="bi bi-funnel me-2"></i>Filtros de Exportação</h6>
+    </div>
+    <div class="card-body pt-2">
+        <form method="GET" action="{{ url_for('reports.index') }}" class="row g-2 align-items-end">
+            <div class="col-12 col-sm-6 col-md-auto">
+                <label class="form-label text-muted small mb-1">Tipo</label>
+                <select name="type" class="form-select form-select-sm bg-dark text-light border-secondary" style="min-width:120px;">
+                    <option value="">Todos</option>
+                    <option value="Receita" {% if selected_type == 'Receita' %}selected{% endif %}>Receita</option>
+                    <option value="Despesa" {% if selected_type == 'Despesa' %}selected{% endif %}>Despesa</option>
+                </select>
+            </div>
+            <div class="col-12 col-sm-6 col-md-auto">
+                <label class="form-label text-muted small mb-1">Categoria</label>
+                <select name="category" class="form-select form-select-sm bg-dark text-light border-secondary" style="min-width:140px;">
+                    <option value="">Todas</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-sm-6 col-md-auto">
+                <label class="form-label text-muted small mb-1">Mês</label>
+                <select name="month" class="form-select form-select-sm bg-dark text-light border-secondary" style="min-width:120px;">
+                    <option value="">Todos</option>
+                    {% for m_num, m_name in months %}
+                    <option value="{{ m_num }}" {% if m_num|string == selected_month %}selected{% endif %}>{{ m_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-sm-6 col-md-auto">
+                <label class="form-label text-muted small mb-1">Ano</label>
+                <select name="year" class="form-select form-select-sm bg-dark text-light border-secondary" style="min-width:100px;">
+                    <option value="">Todos</option>
+                    {% for y in years %}
+                    <option value="{{ y }}" {% if y|string == selected_year %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-search me-1"></i>Visualizar
+                </button>
+                <a href="{{ url_for('reports.index') }}" class="btn btn-secondary btn-sm ms-1">
+                    <i class="bi bi-x-circle me-1"></i>Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Summary -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card card-dark text-center">
+            <div class="card-body py-3">
+                <p class="text-muted small mb-1">Receitas</p>
+                <h5 class="text-income mb-0">R$ {{ total_income|brl }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card card-dark text-center">
+            <div class="card-body py-3">
+                <p class="text-muted small mb-1">Despesas</p>
+                <h5 class="text-expense mb-0">R$ {{ total_expense|brl }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card card-dark text-center">
+            <div class="card-body py-3">
+                <p class="text-muted small mb-1">Saldo</p>
+                <h5 class="{% if balance >= 0 %}text-balance{% else %}text-expense{% endif %} mb-0">
+                    R$ {{ balance|brl }}
+                </h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card card-dark text-center">
+            <div class="card-body py-3">
+                <p class="text-muted small mb-1">Registros</p>
+                <h5 class="text-white mb-0">{{ transactions|length }}</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Export Buttons -->
+<div class="card card-dark mb-4">
+    <div class="card-header border-0 pb-0">
+        <h6 class="mb-0"><i class="bi bi-download me-2"></i>Exportar Dados</h6>
+    </div>
+    <div class="card-body">
+        <p class="text-muted small mb-3">Os filtros acima serão aplicados na exportação.</p>
+        <div class="d-flex gap-3 flex-wrap">
+            <a href="{{ url_for('reports.export_csv', month=selected_month, year=selected_year, type=selected_type, category=selected_category) }}"
+               class="btn btn-outline-success">
+                <i class="bi bi-filetype-csv me-2"></i>Exportar CSV
+            </a>
+            <a href="{{ url_for('reports.export_excel', month=selected_month, year=selected_year, type=selected_type, category=selected_category) }}"
+               class="btn btn-outline-info">
+                <i class="bi bi-file-earmark-spreadsheet me-2"></i>Exportar Excel (.xlsx)
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Power BI Instructions -->
+<div class="card card-dark mb-4">
+    <div class="card-header border-0 pb-0">
+        <h6 class="mb-0"><i class="bi bi-bar-chart-steps me-2 text-warning"></i>Como Importar no Power BI</h6>
+    </div>
+    <div class="card-body">
+        <ol class="text-muted small ps-3 mb-0">
+            <li class="mb-2">Exporte os dados em <strong class="text-light">CSV</strong> ou <strong class="text-light">Excel</strong> usando os botões acima.</li>
+            <li class="mb-2">Abra o <strong class="text-light">Power BI Desktop</strong>.</li>
+            <li class="mb-2">Clique em <strong class="text-light">Obter Dados</strong> → <strong class="text-light">Texto/CSV</strong> (ou Excel).</li>
+            <li class="mb-2">Selecione o arquivo exportado e clique em <strong class="text-light">Carregar</strong>.</li>
+            <li class="mb-2">Use as colunas: <code>Tipo</code>, <code>Categoria</code>, <code>Valor</code>, <code>Data</code> para criar seus visuais.</li>
+            <li>Crie medidas DAX para Receitas, Despesas e Saldo conforme necessário.</li>
+        </ol>
+    </div>
+</div>
+
+<!-- Preview Table -->
+{% if transactions %}
+<div class="card card-dark">
+    <div class="card-header border-0 pb-0">
+        <h6 class="mb-0"><i class="bi bi-table me-2"></i>Pré-visualização ({{ transactions|length }} registros)</h6>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-dark table-sm align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-3">Data</th>
+                        <th>Descrição</th>
+                        <th>Categoria</th>
+                        <th>Tipo</th>
+                        <th class="text-end pe-3">Valor (R$)</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in transactions[:20] %}
+                    <tr>
+                        <td class="ps-3 text-muted small">{{ t.date.strftime("%d/%m/%Y") }}</td>
+                        <td>{{ t.description }}</td>
+                        <td><span class="badge bg-secondary">{{ t.category }}</span></td>
+                        <td>
+                            {% if t.type == 'Receita' %}
+                            <span class="badge bg-income-soft text-income">{{ t.type }}</span>
+                            {% else %}
+                            <span class="badge bg-expense-soft text-expense">{{ t.type }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end pe-3 {% if t.type == 'Receita' %}text-income{% else %}text-expense{% endif %}">
+                            R$ {{ t.amount|brl }}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                    {% if transactions|length > 20 %}
+                    <tr>
+                        <td colspan="5" class="text-center text-muted small py-2">
+                            ... e mais {{ transactions|length - 20 }} registros no arquivo exportado.
+                        </td>
+                    </tr>
+                    {% endif %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endif %}
+{% endblock %}
