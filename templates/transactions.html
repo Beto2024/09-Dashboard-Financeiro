@@ -1,0 +1,247 @@
+{% extends "base.html" %}
+
+{% block title %}Transações — FinDash{% endblock %}
+
+{% block content %}
+<div class="page-header mb-4">
+    <div class="d-flex justify-content-between align-items-center">
+        <div>
+            <h4 class="mb-1"><i class="bi bi-arrow-left-right me-2 text-primary"></i>Transações</h4>
+            <p class="text-muted mb-0">Gerencie suas receitas e despesas</p>
+        </div>
+        <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+            <i class="bi bi-plus-circle me-2"></i>Nova Transação
+        </button>
+    </div>
+</div>
+
+<!-- Summary -->
+<div class="row g-3 mb-4">
+    <div class="col-6 col-md-3">
+        <div class="card card-dark text-center py-2">
+            <div class="card-body py-2">
+                <p class="text-muted small mb-1">Receitas Filtradas</p>
+                <h5 class="text-income mb-0">R$ {{ "%.2f"|format(total_income)|replace(".", ",") }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card card-dark text-center py-2">
+            <div class="card-body py-2">
+                <p class="text-muted small mb-1">Despesas Filtradas</p>
+                <h5 class="text-expense mb-0">R$ {{ "%.2f"|format(total_expense)|replace(".", ",") }}</h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card card-dark text-center py-2">
+            <div class="card-body py-2">
+                <p class="text-muted small mb-1">Saldo</p>
+                <h5 class="{% if total_income - total_expense >= 0 %}text-balance{% else %}text-expense{% endif %} mb-0">
+                    R$ {{ "%.2f"|format(total_income - total_expense)|replace(".", ",") }}
+                </h5>
+            </div>
+        </div>
+    </div>
+    <div class="col-6 col-md-3">
+        <div class="card card-dark text-center py-2">
+            <div class="card-body py-2">
+                <p class="text-muted small mb-1">Total</p>
+                <h5 class="text-white mb-0">{{ transactions|length }} transações</h5>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Filters -->
+<div class="card card-dark mb-4">
+    <div class="card-body py-2">
+        <form method="GET" action="{{ url_for('transactions.index') }}" class="row g-2 align-items-end">
+            <div class="col-12 col-sm-6 col-md-auto">
+                <label class="form-label text-muted small mb-1">Tipo</label>
+                <select name="type" class="form-select form-select-sm bg-dark text-light border-secondary" style="min-width:120px;">
+                    <option value="">Todos</option>
+                    {% for t in types %}
+                    <option value="{{ t }}" {% if t == selected_type %}selected{% endif %}>{{ t }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-sm-6 col-md-auto">
+                <label class="form-label text-muted small mb-1">Categoria</label>
+                <select name="category" class="form-select form-select-sm bg-dark text-light border-secondary" style="min-width:140px;">
+                    <option value="">Todas</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat }}" {% if cat == selected_category %}selected{% endif %}>{{ cat }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-sm-6 col-md-auto">
+                <label class="form-label text-muted small mb-1">Mês</label>
+                <select name="month" class="form-select form-select-sm bg-dark text-light border-secondary" style="min-width:120px;">
+                    <option value="">Todos</option>
+                    {% for m_num, m_name in months %}
+                    <option value="{{ m_num }}" {% if m_num|string == selected_month %}selected{% endif %}>{{ m_name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-12 col-sm-6 col-md-auto">
+                <label class="form-label text-muted small mb-1">Ano</label>
+                <select name="year" class="form-select form-select-sm bg-dark text-light border-secondary" style="min-width:100px;">
+                    <option value="">Todos</option>
+                    {% for y in years %}
+                    <option value="{{ y }}" {% if y|string == selected_year %}selected{% endif %}>{{ y }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary btn-sm">
+                    <i class="bi bi-funnel me-1"></i>Filtrar
+                </button>
+                <a href="{{ url_for('transactions.index') }}" class="btn btn-secondary btn-sm ms-1">
+                    <i class="bi bi-x-circle me-1"></i>Limpar
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Transactions Table -->
+<div class="card card-dark">
+    <div class="card-body p-0">
+        {% if transactions %}
+        <div class="table-responsive">
+            <table class="table table-dark table-hover align-middle mb-0">
+                <thead>
+                    <tr>
+                        <th class="ps-3">Data</th>
+                        <th>Descrição</th>
+                        <th>Categoria</th>
+                        <th>Tipo</th>
+                        <th class="text-end">Valor</th>
+                        <th class="text-center pe-3">Ações</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for t in transactions %}
+                    <tr>
+                        <td class="ps-3 text-muted small">{{ t.date.strftime("%d/%m/%Y") }}</td>
+                        <td>{{ t.description }}</td>
+                        <td>
+                            <span class="badge bg-secondary">{{ t.category }}</span>
+                        </td>
+                        <td>
+                            {% if t.type == 'Receita' %}
+                            <span class="badge bg-income-soft text-income"><i class="bi bi-arrow-up me-1"></i>{{ t.type }}</span>
+                            {% else %}
+                            <span class="badge bg-expense-soft text-expense"><i class="bi bi-arrow-down me-1"></i>{{ t.type }}</span>
+                            {% endif %}
+                        </td>
+                        <td class="text-end fw-bold {% if t.type == 'Receita' %}text-income{% else %}text-expense{% endif %}">
+                            {% if t.type == 'Receita' %}+{% else %}-{% endif %}R$ {{ "%.2f"|format(t.amount)|replace(".", ",") }}
+                        </td>
+                        <td class="text-center pe-3">
+                            <a href="{{ url_for('transactions.edit', transaction_id=t.id) }}" class="btn btn-sm btn-outline-primary me-1" title="Editar">
+                                <i class="bi bi-pencil"></i>
+                            </a>
+                            <button class="btn btn-sm btn-outline-danger" title="Excluir"
+                                onclick="confirmDelete({{ t.id }}, '{{ t.description|e }}')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-inbox fs-1 text-muted d-block mb-3"></i>
+            <p class="text-muted">Nenhuma transação encontrada.</p>
+            <button class="btn btn-primary btn-sm" data-bs-toggle="modal" data-bs-target="#addTransactionModal">
+                <i class="bi bi-plus-circle me-1"></i>Adicionar primeira transação
+            </button>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Transaction Modal -->
+<div class="modal fade" id="addTransactionModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-dark border-secondary">
+            <div class="modal-header border-secondary">
+                <h5 class="modal-title"><i class="bi bi-plus-circle me-2 text-primary"></i>Nova Transação</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="POST" action="{{ url_for('transactions.create') }}">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Descrição <span class="text-danger">*</span></label>
+                        <input type="text" name="description" class="form-control bg-dark text-light border-secondary"
+                               placeholder="Ex: Supermercado, Salário..." required>
+                    </div>
+                    <div class="row g-3">
+                        <div class="col-6">
+                            <label class="form-label">Valor (R$) <span class="text-danger">*</span></label>
+                            <input type="number" name="amount" class="form-control bg-dark text-light border-secondary"
+                                   step="0.01" min="0.01" placeholder="0,00" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Data <span class="text-danger">*</span></label>
+                            <input type="date" name="date" class="form-control bg-dark text-light border-secondary" required>
+                        </div>
+                    </div>
+                    <div class="row g-3 mt-0">
+                        <div class="col-6">
+                            <label class="form-label">Tipo <span class="text-danger">*</span></label>
+                            <select name="type" class="form-select bg-dark text-light border-secondary" required>
+                                {% for t in types %}
+                                <option value="{{ t }}">{{ t }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label">Categoria <span class="text-danger">*</span></label>
+                            <select name="category" class="form-select bg-dark text-light border-secondary" required>
+                                {% for cat in categories %}
+                                <option value="{{ cat }}">{{ cat }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer border-secondary">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-check-circle me-1"></i>Salvar
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirm Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered modal-sm">
+        <div class="modal-content bg-dark border-danger">
+            <div class="modal-header border-danger">
+                <h6 class="modal-title text-danger"><i class="bi bi-exclamation-triangle me-2"></i>Confirmar Exclusão</h6>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p class="mb-1 text-muted small">Deseja excluir a transação:</p>
+                <p class="fw-bold" id="deleteTransactionName"></p>
+            </div>
+            <div class="modal-footer border-secondary">
+                <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">Cancelar</button>
+                <form id="deleteForm" method="POST">
+                    <button type="submit" class="btn btn-danger btn-sm">
+                        <i class="bi bi-trash me-1"></i>Excluir
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
