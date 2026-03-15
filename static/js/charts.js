@@ -3,8 +3,8 @@
  */
 
 const CHART_DEFAULTS = {
-    color: '#8b949e',
-    gridColor: 'rgba(48, 54, 61, 0.8)',
+    color: '#a0aab4',
+    gridColor: 'rgba(26, 61, 46, 0.8)',
     fontFamily: "'Segoe UI', system-ui, sans-serif",
 };
 
@@ -20,11 +20,11 @@ function buildChartOptions(type, extras = {}) {
                 labels: { color: CHART_DEFAULTS.color, padding: 16, boxWidth: 12 },
             },
             tooltip: {
-                backgroundColor: '#1c2128',
-                borderColor: '#30363d',
+                backgroundColor: '#112d20',
+                borderColor: '#1a3d2e',
                 borderWidth: 1,
-                titleColor: '#e6edf3',
-                bodyColor: '#8b949e',
+                titleColor: '#ffffff',
+                bodyColor: '#a0aab4',
                 callbacks: {
                     label: function(ctx) {
                         const val = ctx.parsed.y ?? ctx.parsed;
