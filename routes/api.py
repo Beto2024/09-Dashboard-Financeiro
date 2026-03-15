@@ -144,9 +144,9 @@ def expenses_by_category():
     data = [round(r.total, 2) for r in results]
 
     colors = [
-        "#FF6384", "#36A2EB", "#FFCE56", "#4BC0C0",
-        "#9966FF", "#FF9F40", "#FF6384", "#C9CBCF",
-        "#4BC0C0", "#36A2EB"
+        "#4caf50", "#009688", "#26a69a", "#ffd54f",
+        "#ff9800", "#ef5350", "#00c853", "#80cbc4",
+        "#a5d6a7", "#26a69a"
     ]
 
     return jsonify({
@@ -191,14 +191,14 @@ def monthly_comparison():
             {
                 "label": "Receitas",
                 "data": incomes,
-                "backgroundColor": "rgba(40, 199, 111, 0.7)",
-                "borderColor": "#28c76f",
+                "backgroundColor": "rgba(0, 200, 83, 0.7)",
+                "borderColor": "#00c853",
             },
             {
                 "label": "Despesas",
                 "data": expenses,
-                "backgroundColor": "rgba(234, 84, 85, 0.7)",
-                "borderColor": "#ea5455",
+                "backgroundColor": "rgba(239, 83, 80, 0.7)",
+                "borderColor": "#ef5350",
             },
         ]
     })
@@ -238,8 +238,8 @@ def balance_evolution():
         "datasets": [{
             "label": "Saldo Acumulado",
             "data": balance,
-            "borderColor": "#7367f0",
-            "backgroundColor": "rgba(115, 103, 240, 0.1)",
+            "borderColor": "#009688",
+            "backgroundColor": "rgba(0, 150, 136, 0.1)",
             "fill": True,
             "tension": 0.4,
         }]
