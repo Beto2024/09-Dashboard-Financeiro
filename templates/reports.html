@@ -68,7 +68,7 @@
         <div class="card card-dark text-center">
             <div class="card-body py-3">
                 <p class="text-muted small mb-1">Receitas</p>
-                <h5 class="text-income mb-0">R$ {{ "%.2f"|format(total_income)|replace(".", ",") }}</h5>
+                <h5 class="text-income mb-0">R$ {{ total_income|brl }}</h5>
             </div>
         </div>
     </div>
@@ -76,7 +76,7 @@
         <div class="card card-dark text-center">
             <div class="card-body py-3">
                 <p class="text-muted small mb-1">Despesas</p>
-                <h5 class="text-expense mb-0">R$ {{ "%.2f"|format(total_expense)|replace(".", ",") }}</h5>
+                <h5 class="text-expense mb-0">R$ {{ total_expense|brl }}</h5>
             </div>
         </div>
     </div>
@@ -85,7 +85,7 @@
             <div class="card-body py-3">
                 <p class="text-muted small mb-1">Saldo</p>
                 <h5 class="{% if balance >= 0 %}text-balance{% else %}text-expense{% endif %} mb-0">
-                    R$ {{ "%.2f"|format(balance)|replace(".", ",") }}
+                    R$ {{ balance|brl }}
                 </h5>
             </div>
         </div>
@@ -169,7 +169,7 @@
                             {% endif %}
                         </td>
                         <td class="text-end pe-3 {% if t.type == 'Receita' %}text-income{% else %}text-expense{% endif %}">
-                            R$ {{ "%.2f"|format(t.amount)|replace(".", ",") }}
+                            R$ {{ t.amount|brl }}
                         </td>
                     </tr>
                     {% endfor %}

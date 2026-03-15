@@ -2,9 +2,17 @@ from flask import Flask
 from config import Config
 from models.models import db
 
+def _brl(value):
+    """Format a float as Brazilian currency: 44270.5 → '44.270,50'."""
+    formatted = f"{float(value):,.2f}"          # "44,270.50"  (en-US)
+    return formatted.replace(",", "X").replace(".", ",").replace("X", ".")
+
+
 def create_app():
     app = Flask(__name__)
     app.config.from_object(Config)
+
+    app.jinja_env.filters["brl"] = _brl
 
     db.init_app(app)
 

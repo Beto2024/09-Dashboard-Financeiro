@@ -45,7 +45,7 @@
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <p class="text-muted small mb-1">Total Receitas</p>
-                        <h3 class="mb-0 text-income">R$ {{ "%.2f"|format(total_income)|replace(".", ",") }}</h3>
+                        <h3 class="mb-0 text-income">R$ {{ total_income|brl }}</h3>
                     </div>
                     <div class="summary-icon bg-income-soft">
                         <i class="bi bi-arrow-up-circle-fill text-income fs-4"></i>
@@ -66,7 +66,7 @@
                 <div class="d-flex justify-content-between align-items-start">
                     <div>
                         <p class="text-muted small mb-1">Total Despesas</p>
-                        <h3 class="mb-0 text-expense">R$ {{ "%.2f"|format(total_expense)|replace(".", ",") }}</h3>
+                        <h3 class="mb-0 text-expense">R$ {{ total_expense|brl }}</h3>
                     </div>
                     <div class="summary-icon bg-expense-soft">
                         <i class="bi bi-arrow-down-circle-fill text-expense fs-4"></i>
@@ -88,7 +88,7 @@
                     <div>
                         <p class="text-muted small mb-1">Saldo Total</p>
                         <h3 class="mb-0 {% if balance >= 0 %}text-balance{% else %}text-expense{% endif %}">
-                            R$ {{ "%.2f"|format(balance)|replace(".", ",") }}
+                            R$ {{ balance|brl }}
                         </h3>
                     </div>
                     <div class="summary-icon {% if balance >= 0 %}bg-balance-soft{% else %}bg-expense-soft{% endif %}">
