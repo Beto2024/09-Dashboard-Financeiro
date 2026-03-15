@@ -77,3 +77,38 @@ function confirmDelete(id, description) {
         bsModal.show();
     }
 }
+
+async function loadDemoData() {
+    if (!confirm('Isso irá substituir quaisquer transações existentes por dados de demonstração. Deseja continuar?')) return;
+
+    try {
+        const res = await fetch('/api/seed-demo', { method: 'POST' });
+        const data = await res.json();
+        if (res.ok) {
+            alert(`✅ ${data.count} transações demo carregadas com sucesso!`);
+            window.location.reload();
+        } else {
+            alert('❌ Erro ao carregar dados: ' + data.error);
+        }
+    } catch (err) {
+        alert('❌ Erro de conexão: ' + err.message);
+    }
+}
+
+async function clearAllData() {
+    if (!confirm('Tem certeza que deseja remover TODAS as transações?')) return;
+    if (!confirm('Confirme novamente: todos os dados serão apagados permanentemente.')) return;
+
+    try {
+        const res = await fetch('/api/clear-all', { method: 'DELETE' });
+        const data = await res.json();
+        if (res.ok) {
+            alert(`✅ ${data.count} transações removidas com sucesso!`);
+            window.location.reload();
+        } else {
+            alert('❌ Erro ao limpar dados: ' + data.error);
+        }
+    } catch (err) {
+        alert('❌ Erro de conexão: ' + err.message);
+    }
+}

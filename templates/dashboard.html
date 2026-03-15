@@ -107,6 +107,23 @@
 </div>
 
 <!-- Charts Row 1 -->
+{% if transaction_count == 0 %}
+<div class="row g-4 mb-4">
+    <div class="col-12">
+        <div class="card card-dark text-center py-5">
+            <div class="card-body">
+                <i class="bi bi-bar-chart-line text-muted" style="font-size:4rem;"></i>
+                <h5 class="mt-3 mb-1">Nenhuma transação encontrada</h5>
+                <p class="text-muted mb-4">Carregue dados de demonstração para visualizar os dashboards</p>
+                <button class="btn btn-success btn-lg" onclick="loadDemoData()">
+                    <i class="bi bi-database-fill-gear me-2"></i>Carregar Dados de Demonstração
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<!-- Charts Row 1 -->
 <div class="row g-4 mb-4">
     <div class="col-12 col-lg-5">
         <div class="card card-dark h-100">
@@ -149,11 +166,12 @@
         </div>
     </div>
 </div>
+{% endif %}
 {% endblock %}
 
 {% block extra_scripts %}
-<script src="{{ url_for('static', filename='vendor/chartjs/chart.umd.min.js') }}"></script>
-<script src="{{ url_for('static', filename='js/charts.js') }}"></script>
+<script src="{{ url_for('static', filename='vendor/chartjs/chart.umd.min.js') }}?v={{ config.get('CSS_VERSION', '2') }}"></script>
+<script src="{{ url_for('static', filename='js/charts.js') }}?v={{ config.get('CSS_VERSION', '2') }}"></script>
 <script>
     initDashboardCharts({{ selected_month }}, {{ selected_year }});
 </script>

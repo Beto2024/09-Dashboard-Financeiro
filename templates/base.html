@@ -10,7 +10,7 @@
     <!-- Bootstrap Icons -->
     <link href="{{ url_for('static', filename='vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
     <!-- Custom CSS -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}?v={{ config.get('CSS_VERSION', '2') }}">
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -36,6 +36,10 @@
         </a>
     </nav>
     <div class="sidebar-footer">
+        <button class="btn btn-outline-success btn-sm w-100 mb-2" id="btnLoadDemo" onclick="loadDemoData()">
+            <i class="bi bi-database-fill-gear me-1"></i>
+            <span>Dados Demo</span>
+        </button>
         <small class="text-muted">
             <i class="bi bi-circle-fill text-success me-1" style="font-size:0.5rem;"></i>
             Sistema Online
@@ -87,7 +91,7 @@
 <!-- Bootstrap 5 JS -->
 <script src="{{ url_for('static', filename='vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
 <!-- App JS -->
-<script src="{{ url_for('static', filename='js/app.js') }}"></script>
+<script src="{{ url_for('static', filename='js/app.js') }}?v={{ config.get('CSS_VERSION', '2') }}"></script>
 {% block extra_scripts %}{% endblock %}
 </body>
 </html>

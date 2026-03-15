@@ -9,3 +9,4 @@ class Config:
         "DATABASE_URL", "sqlite:///" + os.path.join(BASE_DIR, "financeiro.db")
     )
     SQLALCHEMY_TRACK_MODIFICATIONS = False
+    CSS_VERSION = "2"
