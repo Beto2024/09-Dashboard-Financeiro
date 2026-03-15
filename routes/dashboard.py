@@ -38,4 +38,5 @@ def index():
         selected_year=year,
         months=months,
         years=years,
+        transaction_count=Transaction.query.count(),
     )

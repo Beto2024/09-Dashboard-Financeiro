@@ -1,5 +1,6 @@
 /* ===== Variables ===== */
-:root {
+:root,
+[data-bs-theme="dark"] {
     --bg-primary: #0a1612;
     --bg-secondary: #0f1f1a;
     --bg-card: #112d20;
@@ -13,6 +14,9 @@
     --sidebar-width: 240px;
     --sidebar-collapsed-width: 60px;
     --navbar-height: 56px;
+    /* Override Bootstrap primary color to green */
+    --bs-primary: #00c853;
+    --bs-primary-rgb: 0, 200, 83;
 }
 
 /* ===== Reset & Base ===== */
